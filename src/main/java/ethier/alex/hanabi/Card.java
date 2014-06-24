@@ -4,13 +4,7 @@
  */
 package ethier.alex.hanabi;
 
-import com.google.common.base.Charsets;
-import com.google.common.hash.Hashing;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
-
  @author alex
  */
 public class Card {

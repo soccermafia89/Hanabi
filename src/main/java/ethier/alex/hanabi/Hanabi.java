@@ -15,7 +15,6 @@ public class Hanabi {
 
     Deck deck;
     List<Player> players;
-    
     int lives;
     int timer = -1;
 
@@ -43,7 +42,6 @@ public class Hanabi {
             PlayerResponse response = player.play();
 
             if (response.responseType == ResponseType.DISCARD) {
-            } else if (response.responseType == ResponseType.DISCARD) {
                 if (deck.hasNext()) {
                     Card card = deck.next();
 
@@ -56,7 +54,6 @@ public class Hanabi {
 
                     }
                 } else {
-                    
                 }
             } else if (response.responseType == ResponseType.PLAY) {
             } else if (response.responseType == ResponseType.TELL) {
@@ -67,7 +64,7 @@ public class Hanabi {
     }
 
     public boolean gameOver() {
-        if(lives == 0 || timer == 0) {
+        if (lives == 0 || timer == 0) {
             return true;
         } else {
             return false;

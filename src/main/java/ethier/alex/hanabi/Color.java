@@ -9,5 +9,5 @@ package ethier.alex.hanabi;
  @author alex
  */
 public enum Color {
-    RED, BLUE, YELLOW, GREEN;
+    RED, BLUE, YELLOW, GREEN, WHITE;
 }
