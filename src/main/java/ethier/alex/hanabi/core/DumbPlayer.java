@@ -4,10 +4,10 @@
  */
 package ethier.alex.hanabi.core;
 
+import ethier.alex.hanabi.actions.PlayerDrawAction;
+import ethier.alex.hanabi.actions.PlayerResponse;
+import ethier.alex.hanabi.actions.PlayerResponseType;
 import ethier.alex.hanabi.deck.Color;
-import ethier.alex.hanabi.game.actions.PlayerDrawAction;
-import ethier.alex.hanabi.game.actions.PlayerResponse;
-import ethier.alex.hanabi.game.actions.PlayerResponseType;
 
 /**
 

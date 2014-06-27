@@ -1,4 +1,4 @@
-package ethier.alex.hanabi.game.actions;
+package ethier.alex.hanabi.actions;
 
 import ethier.alex.hanabi.deck.Card;
 

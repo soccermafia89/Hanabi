@@ -1,4 +1,4 @@
-package ethier.alex.hanabi.board;
+package ethier.alex.hanabi.state;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;

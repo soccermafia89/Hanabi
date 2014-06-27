@@ -4,17 +4,22 @@
  */
 package ethier.alex.hanabi.core;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import ethier.alex.hanabi.board.Board;
-import ethier.alex.hanabi.board.Discard;
+import ethier.alex.hanabi.actions.DiscardResponse;
+import ethier.alex.hanabi.actions.PlayResponse;
+import ethier.alex.hanabi.actions.PlayerDrawAction;
+import ethier.alex.hanabi.actions.PlayerResponse;
+import ethier.alex.hanabi.actions.PlayerResponseType;
+import ethier.alex.hanabi.actions.TellResponse;
 import ethier.alex.hanabi.deck.Card;
 import ethier.alex.hanabi.deck.Deck;
-import ethier.alex.hanabi.game.actions.DiscardResponse;
-import ethier.alex.hanabi.game.actions.PlayResponse;
-import ethier.alex.hanabi.game.actions.PlayerDrawAction;
-import ethier.alex.hanabi.game.actions.PlayerResponse;
-import ethier.alex.hanabi.game.actions.PlayerResponseType;
+import ethier.alex.hanabi.state.Board;
+import ethier.alex.hanabi.state.Discard;
+import ethier.alex.hanabi.state.InvisibleHand;
+import ethier.alex.hanabi.state.VisibleHand;
 
 /**
  * @author alex
@@ -25,28 +30,47 @@ public class Hanabi {
 	Deck deck;
 	Discard discard;
 	List<Player> players;
+	
+	VisibleHand[] visibleHands;
+	InvisibleHand[] invisibleHands;
 
+	int timeCounters;
 	int lives;
 	int timer;
 	boolean gameWon;
 
-	public Hanabi() {
+	public Hanabi(List<Player> myPlayers) {
+		players = myPlayers;
+
+		for (int i = 0; i < players.size(); i++) {
+			Player player = players.get(i);
+			player.setPosition(i);
+		}
+		
 		deck = new Deck();
 		board = new Board();
 		discard = new Discard();
-		
-		System.out.println("CHECK LIFE COUNT");
+
+		System.out.println("CHECK LIFE COUNT AND TIME COUNTER COUNT");
+		timeCounters = 10;
 		lives = 3;
 		timer = players.size();
 		gameWon = false;
-	}
-	
-	public void setPlayers(List<Player> myPlayers) {
-		players = myPlayers;
 		
-		for(int i=0; i < players.size();i++) {
-			Player player = players.get(i);
-			player.setPosition(i);
+		invisibleHands = new InvisibleHand[players.size()];
+		for(int i=0; i < invisibleHands.length;i++) {
+			invisibleHands[0] = new InvisibleHand();
+		}
+		
+		visibleHands = new VisibleHand[players.size()];
+		for(int i=0; i < visibleHands.length;i++) {
+			
+			Card[] newHand = new Card[5];
+			for(int j=0; j < 5; j++) {
+				newHand[j] = deck.next();
+			}
+			
+			visibleHands[0] = new VisibleHand(newHand);
 		}
 	}
 
@@ -54,6 +78,21 @@ public class Hanabi {
 		int turn = 0;
 
 		while (!gameOver()) {
+			
+			//Update the game state for each player.
+			for(int i=0; i < players.size(); i++) {
+				
+				Map<Integer, VisibleHand> playersVisibleHands = new HashMap<Integer, VisibleHand>();
+				for(int j=0; j < players.size(); j++) {
+					if(i != j) {
+						playersVisibleHands.put(j, visibleHands[j]);
+					}
+				}
+				
+				Player player = players.get(i);
+				player.updateState(board, discard, playersVisibleHands, invisibleHands[i], timeCounters, lives, timer);
+			}
+			
 			int playerTurn = turn % players.size();
 
 			Player player = players.get(playerTurn);
@@ -66,23 +105,41 @@ public class Hanabi {
 				PlayResponse playResponse = (PlayResponse) response;
 				this.handlePlayerPlay(playResponse, playerTurn);
 			} else if (response.getResponseType() == PlayerResponseType.TELL) {
+				TellResponse tellResponse = (TellResponse) response;
+				this.handlePlayerTell(tellResponse, playerTurn);
 			} else {
 				throw new RuntimeException("Invalid state reached.");
 			}
 		}
 	}
-	
+
+	public void handlePlayerTell(TellResponse tellResponse, int playerTurn) {
+		timeCounters--;
+		if (timeCounters < 0) {
+			throw new RuntimeException(
+					"Rule Broken: negative time counter reached.");
+		}
+		System.out.println("TODO");
+	}
+
 	public void handlePlayerPlay(PlayResponse playResponse, int playerTurn) {
 		Card playedCard = playResponse.getCard();
 		boolean isPlayable = board.playCard(playedCard);
-		
-		if(!isPlayable) {
+
+		if (!isPlayable) {
 			lives--;
 			discard.discard(playedCard);
-		} else if(board.isComplete()) {
-			gameWon = true;
+		} else {
+
+			if (playedCard.getNumber() == 5) {
+				timeCounters++;
+			}
+
+			if (board.isComplete()) {
+				gameWon = true;
+			}
 		}
-		
+
 		for (int i = 0; i < players.size(); i++) {
 			if (i != playerTurn) {
 				Player otherPlayer = players.get(i);
@@ -91,16 +148,18 @@ public class Hanabi {
 		}
 	}
 
-	public void handlePlayerDiscard(DiscardResponse discardResponse, int playerTurn) {
+	public void handlePlayerDiscard(DiscardResponse discardResponse,
+			int playerTurn) {
+		timeCounters++;
 		discard.discard(discardResponse.getCard());
-		
+
 		for (int i = 0; i < players.size(); i++) {
 			if (i != playerTurn) {
 				Player otherPlayer = players.get(i);
 				otherPlayer.listen(discardResponse, playerTurn);
 			}
 		}
-		
+
 		if (deck.hasNext()) {
 			Card card = deck.next();
 
@@ -118,10 +177,10 @@ public class Hanabi {
 	}
 
 	public boolean gameOver() {
-		if(gameWon) {
+		if (gameWon) {
 			return true;
 		}
-		
+
 		if (lives == 0 || timer == 0) {
 			return true;
 		} else {

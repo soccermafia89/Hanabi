@@ -1,4 +1,4 @@
-package ethier.alex.hanabi.board;
+package ethier.alex.hanabi.state;
 
 import ethier.alex.hanabi.deck.Card;
 import ethier.alex.hanabi.deck.Color;
