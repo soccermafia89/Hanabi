@@ -2,12 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ethier.alex.hanabi;
+package ethier.alex.hanabi.deck;
 
 /**
 
  @author alex
  */
-public enum ResponseType {
-    DISCARD, PLAY, TELL
+public enum Color {
+    RED, BLUE, YELLOW, GREEN;
 }

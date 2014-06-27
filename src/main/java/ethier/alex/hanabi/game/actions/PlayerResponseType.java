@@ -2,12 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package ethier.alex.hanabi;
+package ethier.alex.hanabi.game.actions;
 
 /**
 
  @author alex
  */
-public enum Color {
-    RED, BLUE, YELLOW, GREEN;
+public enum PlayerResponseType {
+    DISCARD, PLAY, TELL;
 }
