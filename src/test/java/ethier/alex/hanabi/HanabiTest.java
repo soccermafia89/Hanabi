@@ -5,6 +5,8 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ethier.alex.hanabi.core.Hanabi;
+
 /**
 
  @author alex
@@ -28,7 +30,7 @@ public class HanabiTest {
         System.out.println("");
         System.out.println("");
 
-        Hanabi hanabi = new Hanabi();
+//        Hanabi hanabi = new Hanabi();
 //        Deck deck = new Deck();
 //        while(deck.hasNext()) {
 //            Card card = deck.next();
