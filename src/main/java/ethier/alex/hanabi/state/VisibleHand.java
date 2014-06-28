@@ -17,7 +17,7 @@ public class VisibleHand {
 		hand = initialHand;
 	}
 	
-	public Card discard(int position) {
+	public Card remove(int position) {
 		Card card = hand[position];
 		hand[position] = null;
 		cardIndex.remove(card);

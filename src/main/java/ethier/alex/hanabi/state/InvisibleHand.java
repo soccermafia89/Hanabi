@@ -11,6 +11,7 @@ public class InvisibleHand {
 	
 	Color[] colorIndex;
 	int[] numberIndex;
+        int[] cardAges;
 	
 	public InvisibleHand() {
 		colorIndex = new Color[5];
@@ -19,12 +20,39 @@ public class InvisibleHand {
 		for(int i=0; i < numberIndex.length;i++) {
 			numberIndex[i] = -1;
 		}
+                
+                for(int i=0; i < cardAges.length;i++) {
+                    cardAges[i] = -1;
+                }
 	}
 	
-	public void discard(int position) {
+        // When a card is played or discarded, the information is removed from their hand.
+	public void removeCard(int position) {
 		colorIndex[position] = null;
 		numberIndex[position] = -1;
 	}
+        
+        public void addCard() {
+            
+            boolean ageIncremented = false;
+            for(int i=0; i < cardAges.length;i++) {
+                int cardAge = cardAges[i];
+                if(cardAge == -1 && ageIncremented == false) {
+                    cardAge = 0;
+                    ageIncremented = true;
+                } else {
+                    cardAges[i] = cardAge++;
+                }
+                
+                if(ageIncremented == false) {
+                    throw new RuntimeException("Invisible Hand has added a card, but all cards have an age!");
+                }
+            }
+        }
+        
+        public int[] getCardAges() {
+            return cardAges;
+        }
 	
 	public Set<Integer> queryColor(Color color) {
 		Set<Integer> cardPositions = new HashSet<Integer>();
@@ -69,14 +97,17 @@ public class InvisibleHand {
 		return cardPositions;
 	}
 	
+        // A player may add additional inferenced information to their own hand
 	public void update(int cardPosition, Color color) {
 		colorIndex[cardPosition] = color;
 	}
 	
+        // A player may add additional inferenced information to their own hand
 	public void update(int cardPosition, int number) {
 		numberIndex[cardPosition] = number;
 	}
 	
+        // Update invisible hand based on game's TellResponse
 	public void update(TellResponse tellResponse) {
 		Set<Integer> cardPositions = tellResponse.getCardPositions();
 		

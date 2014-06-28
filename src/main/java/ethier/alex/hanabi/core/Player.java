@@ -29,7 +29,18 @@ public interface Player {
     
     public PlayerResponse play();
     
-    public void setPosition(int position);
+    public void setName(String name);
     
-    public void updateState(Board board, Discard discard, Map<Integer, VisibleHand> playerHands, InvisibleHand myHand, int timeCounters, int lives, int timer);
+    public String getName();
+    
+    public void setPositions(int position, Map<Integer, String> playerPositions);
+    
+    public void updateState(Board board, 
+                            Discard discard, 
+                            Map<Integer, VisibleHand> playerHands, 
+                            InvisibleHand myHand, 
+                            int deckSize,
+                            int timeCounters, 
+                            int lives, 
+                            int timer);
 }

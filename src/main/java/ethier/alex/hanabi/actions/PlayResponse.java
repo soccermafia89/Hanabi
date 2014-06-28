@@ -5,11 +5,11 @@ import ethier.alex.hanabi.deck.Card;
 public class PlayResponse implements PlayerResponse {
 	
 	PlayerResponseType playerResponseType;
-	Card playedCard;
+	int cardPos;
 	
-	public PlayResponse(Card card) {
+	public PlayResponse(int pos) {
 		playerResponseType = PlayerResponseType.PLAY;
-		playedCard = card;
+		cardPos = pos;
 	}
 
 	@Override
@@ -17,8 +17,8 @@ public class PlayResponse implements PlayerResponse {
 		return playerResponseType;
 	}
 	
-	public Card getCard() {
-		return playedCard;
+	public int getCardPos() {
+		return cardPos;
 	}
 	
 	

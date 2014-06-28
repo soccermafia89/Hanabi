@@ -17,7 +17,8 @@ public class Deck implements Iterator<Card> {
 
     private Iterator<Card> it;
     private final List myDeck;
-    int count = 0;
+    int size;
+//    int count = 0;
 
     public Deck() {
 
@@ -42,6 +43,7 @@ public class Deck implements Iterator<Card> {
         
         Collections.shuffle(myDeck);
         it = myDeck.iterator();
+        size = myDeck.size();
     }
 
     @Override
@@ -51,11 +53,16 @@ public class Deck implements Iterator<Card> {
 
     @Override
     public Card next() {
+        size--;
         return it.next();
     }
 
     @Override
     public void remove() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    public int size() {
+        return size;
     }
 }

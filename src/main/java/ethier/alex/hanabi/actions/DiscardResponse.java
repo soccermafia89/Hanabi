@@ -1,15 +1,13 @@
 package ethier.alex.hanabi.actions;
 
-import ethier.alex.hanabi.deck.Card;
-
 public class DiscardResponse implements PlayerResponse {
 	
 	PlayerResponseType playerResponseType;
-	Card discardCard;
+	int cardPosition;
 	
-	public DiscardResponse(Card card) {
+	public DiscardResponse(int pos) {
 		playerResponseType = PlayerResponseType.DISCARD;
-		discardCard = card;
+		cardPosition = pos;
 	}
 
 	@Override
@@ -17,8 +15,8 @@ public class DiscardResponse implements PlayerResponse {
 		return playerResponseType;
 	}
 	
-	public Card getCard() {
-		return discardCard;
-	}
+	public int getCardPosition() {
+            return cardPosition;
+        }
 
 }
