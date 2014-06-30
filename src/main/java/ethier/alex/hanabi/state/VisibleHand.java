@@ -1,8 +1,12 @@
 package ethier.alex.hanabi.state;
 
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 import ethier.alex.hanabi.deck.Card;
+import ethier.alex.hanabi.deck.Color;
+import java.util.HashSet;
+import java.util.Set;
 
 // The hand of other players which is always visible.
 public class VisibleHand {
@@ -10,6 +14,9 @@ public class VisibleHand {
 	Card[] hand;
 	
 	public VisibleHand(Card[] initialHand) {
+            
+            cardIndex = HashMultiset.create();
+            
 		for(Card card : initialHand) {
 			cardIndex.add(card);
 		}
@@ -50,4 +57,36 @@ public class VisibleHand {
 	public boolean contains(Card card) {
 		return cardIndex.count(card) > 0;
 	}
+        
+        public Set<Integer> queryColor(Color color) {
+            Set<Integer> cardSet = new HashSet<Integer>();
+            
+            for(int i=0; i < hand.length; i++) {
+                if(hand[i] != null) {
+                    Card card = hand[i];
+                    
+                    if(card.getColor() == color) {
+                        cardSet.add(i);
+                    }
+                }
+            }
+            
+            return cardSet;
+        }
+        
+        public Set<Integer> queryNumber(int number) {
+            Set<Integer> cardSet = new HashSet<Integer>();
+            
+            for(int i=0; i < hand.length; i++) {
+                if(hand[i] != null) {
+                    Card card = hand[i];
+                    
+                    if(card.getNumber() == number) {
+                        cardSet.add(i);
+                    }
+                }
+            }
+            
+            return cardSet;
+        }
 }

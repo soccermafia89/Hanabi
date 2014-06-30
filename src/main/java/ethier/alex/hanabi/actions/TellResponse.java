@@ -7,27 +7,27 @@ import ethier.alex.hanabi.deck.Color;
 public class TellResponse implements PlayerResponse {
 	
 	PlayerResponseType playerResponseType;
-	Set<Integer> cardPositions;
 	Color color;
 	int number;
 	boolean isColorInformation;
 	boolean isNumberInformation;
+        int playerPos;
 	
 	
-	public TellResponse(int player, Set<Integer> myCardPositions, Color myColor) {
+	public TellResponse(int player, Color myColor) {
 		playerResponseType = PlayerResponseType.TELL;
 		color = myColor;
 		isColorInformation = true;
 		isNumberInformation = false;
-		cardPositions = myCardPositions;
+                playerPos = player;
 	}
 	
-	public TellResponse(int player, Set<Integer> myCardPositions, int myNumber) {
+	public TellResponse(int player, int myNumber) {
 		playerResponseType = PlayerResponseType.TELL;
 		number = myNumber;
 		isColorInformation = false;
 		isNumberInformation = true;
-		cardPositions = myCardPositions;
+                playerPos = player;
 	}
 
 	@Override
@@ -50,8 +50,8 @@ public class TellResponse implements PlayerResponse {
 	public int getNumber() {
 		return number;
 	}
-	
-	public Set<Integer> getCardPositions() {
-		return cardPositions;
-	}
+        
+        public int getPlayerPos() {
+            return playerPos;
+        }
 }

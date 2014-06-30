@@ -4,6 +4,7 @@
  */
 package ethier.alex.hanabi.core;
 
+import com.google.common.collect.BiMap;
 import java.util.Map;
 
 import ethier.alex.hanabi.actions.PlayerDrawAction;
@@ -33,7 +34,7 @@ public interface Player {
     
     public String getName();
     
-    public void setPositions(int position, Map<Integer, String> playerPositions);
+    public void setPositions(int position, BiMap<Integer, String> playerPositions);
     
     public void updateState(Board board, 
                             Discard discard, 

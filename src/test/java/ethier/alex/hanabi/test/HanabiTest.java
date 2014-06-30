@@ -1,5 +1,10 @@
-package ethier.alex.hanabi;
+package ethier.alex.hanabi.test;
 
+import ethier.alex.hanabi.core.Hanabi;
+import ethier.alex.hanabi.core.Player;
+import ethier.alex.hanabi.state.Board;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -27,13 +32,24 @@ public class HanabiTest {
         System.out.println("********************************************");
         System.out.println("");
         System.out.println("");
+        
+        DumbPlayer dumbPlayer1 = new DumbPlayer();
+        dumbPlayer1.setName("testPlayer1");
+        
+        DumbPlayer dumbPlayer2 = new DumbPlayer();
+        dumbPlayer2.setName("testPlayer2");
+        
+        List<Player> players = new ArrayList<Player>();
+        players.add(dumbPlayer1);
+        players.add(dumbPlayer2);
 
-//        Hanabi hanabi = new Hanabi();
-//        Deck deck = new Deck();
-//        while(deck.hasNext()) {
-//            Card card = deck.next();
-//            System.out.println("Next Card: " + card.printCard(id));
-//        }
+        Hanabi hanabi = new Hanabi(players);
+        
+        Board result = hanabi.playGame();
+        
+        int score = result.getScore();
+        
+        System.out.println("Score: " + score);
 
     }
 }

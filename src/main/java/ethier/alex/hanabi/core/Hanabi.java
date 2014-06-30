@@ -4,6 +4,8 @@
  */
 package ethier.alex.hanabi.core;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,16 +17,22 @@ import ethier.alex.hanabi.actions.PlayerResponse;
 import ethier.alex.hanabi.actions.PlayerResponseType;
 import ethier.alex.hanabi.actions.TellResponse;
 import ethier.alex.hanabi.deck.Card;
+import ethier.alex.hanabi.deck.Color;
 import ethier.alex.hanabi.deck.Deck;
 import ethier.alex.hanabi.state.Board;
 import ethier.alex.hanabi.state.Discard;
 import ethier.alex.hanabi.state.InvisibleHand;
 import ethier.alex.hanabi.state.VisibleHand;
+import java.util.Arrays;
+import java.util.Set;
+import org.apache.log4j.Logger;
 
 /**
  @author alex
  */
 public class Hanabi {
+    
+    private static Logger logger = Logger.getLogger(Hanabi.class);
 
     Board board;
     Deck deck;
@@ -36,13 +44,20 @@ public class Hanabi {
     int lives;
     int timer;
     boolean gameWon;
+    BiMap<Integer, String> playerPositions;
 
     public Hanabi(List<Player> myPlayers) {
-        players = myPlayers;
+        if(myPlayers.size() < 1) {
+            throw new RuntimeException("Invalid number of players: " + myPlayers.size());
+        }
         
-        Map<Integer, String> playerPositions = new HashMap<Integer, String>();
-        for(int i=0; i < players.size();i++) {
+        players = myPlayers;
+
+        playerPositions = HashBiMap.create();
+        for (int i = 0; i < players.size(); i++) {
             playerPositions.put(i, players.get(i).getName());
+            
+            logger.info("Player found: " + players.get(i).getName());
         }
 
         for (int i = 0; i < players.size(); i++) {
@@ -54,7 +69,7 @@ public class Hanabi {
         board = new Board();
         discard = new Discard();
 
-        System.out.println("CHECK LIFE COUNT AND TIME COUNTER COUNT");
+        logger.warn("CHECK LIFE COUNT AND TIME COUNTER COUNT");
         timeCounters = 10;
         lives = 3;
         timer = players.size();
@@ -62,7 +77,7 @@ public class Hanabi {
 
         invisibleHands = new InvisibleHand[players.size()];
         for (int i = 0; i < invisibleHands.length; i++) {
-            invisibleHands[0] = new InvisibleHand();
+            invisibleHands[i] = new InvisibleHand();
         }
 
         visibleHands = new VisibleHand[players.size()];
@@ -73,11 +88,11 @@ public class Hanabi {
                 newHand[j] = deck.next();
             }
 
-            visibleHands[0] = new VisibleHand(newHand);
+            visibleHands[i] = new VisibleHand(newHand);
         }
     }
 
-    public void playGame() {
+    public Board playGame() {
         int turn = 0;
 
         while (!gameOver()) {
@@ -107,6 +122,8 @@ public class Hanabi {
 
             Player player = players.get(playerTurn);
             PlayerResponse response = player.play();
+            
+            logger.info("Turn " + turn + " played by: " + player.getName());
 
             if (response.getResponseType() == PlayerResponseType.DISCARD) {
                 DiscardResponse discardResponse = (DiscardResponse) response;
@@ -120,7 +137,11 @@ public class Hanabi {
             } else {
                 throw new RuntimeException("Invalid state reached.");
             }
+            
+            turn++;
         }
+        
+        return board;
     }
 
     public void handlePlayerTell(TellResponse tellResponse, int playerTurn) {
@@ -129,14 +150,43 @@ public class Hanabi {
             throw new RuntimeException(
                     "Rule Broken: negative time counter reached.");
         }
-        System.out.println("TODO");
+
+
+        int playerPos = tellResponse.getPlayerPos();
+        VisibleHand visibleHand = visibleHands[playerPos];
+        InvisibleHand invisibleHand = invisibleHands[playerPos];
+
+        if (tellResponse.isColorInformation()) {
+            Color color = tellResponse.getColor();
+
+            Set<Integer> matchedCards = visibleHand.queryColor(color);
+            if (matchedCards.isEmpty()) {
+                throw new RuntimeException("Player told another player about 0 cards.");
+            }
+
+            invisibleHand.update(matchedCards, color);
+
+        } else if (tellResponse.isNumberInformation()) {
+
+            int number = tellResponse.getNumber();
+
+            Set<Integer> matchedCards = visibleHand.queryNumber(number);
+            if (matchedCards.isEmpty()) {
+                throw new RuntimeException("Player told another player about 0 cards.");
+            }
+
+            invisibleHand.update(matchedCards, number);
+
+        } else {
+            throw new RuntimeException("Invalid state reached for tell response.");
+        }
     }
 
     public void handlePlayerPlay(PlayResponse playResponse, int playerTurn) {
         int cardPos = playResponse.getCardPos();
         Card playedCard = visibleHands[playerTurn].remove(cardPos);
         invisibleHands[playerTurn].removeCard(cardPos);
-        
+
         boolean isPlayable = board.playCard(playedCard);
 
         if (!isPlayable) {
@@ -163,11 +213,15 @@ public class Hanabi {
 
     public void handlePlayerDiscard(DiscardResponse discardResponse,
                                     int playerTurn) {
+        logger.info("Handling player discard with position: " + discardResponse.getCardPosition());
+        logger.info("Original card ages: " + Arrays.toString(invisibleHands[playerTurn].getCardAges()));
+        
         timeCounters++;
 
         int cardPos = discardResponse.getCardPosition();
         Card discardCard = visibleHands[playerTurn].remove(cardPos);
         discard.discard(discardCard);
+        invisibleHands[playerTurn].removeCard(cardPos);
 
         for (int i = 0; i < players.size(); i++) {
             if (i != playerTurn) {
@@ -191,8 +245,11 @@ public class Hanabi {
             visibleHands[playerTurn].addCard(newCard);
             invisibleHands[playerTurn].addCard();
         } else {
+            logger.info("Deck is out, timer: " + timer);
             timer--;
         }
+        
+        logger.info("New card ages: " + Arrays.toString(invisibleHands[playerTurn].getCardAges()));
     }
 
     public boolean gameOver() {
